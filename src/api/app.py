@@ -26,7 +26,6 @@ class PatientInput(BaseModel):
 
 @app.post("/predict")
 def predict(patient: PatientInput):
-    # Calcular features engineered (igual ao ETL)
     smoking_age = patient.SMOKING * patient.AGE
     
     sintomas = (
@@ -46,17 +45,22 @@ def predict(patient: PatientInput):
         patient.SHORTNESS_OF_BREATH * 2
     )
     
-    features = np.array([[
-        patient.GENDER, patient.AGE, patient.SMOKING,
-        patient.YELLOW_FINGERS, patient.ANXIETY, patient.PEER_PRESSURE,
-        patient.CHRONIC_DISEASE, patient.FATIGUE, patient.ALLERGY,
-        patient.WHEEZING, patient.ALCOHOL_CONSUMING, patient.COUGHING,
-        patient.SHORTNESS_OF_BREATH, patient.SWALLOWING_DIFFICULTY,
-        patient.CHEST_PAIN, smoking_age, sintomas, risk_score
-    ]])
-    
-    prediction = model.predict(features)[0]
-    probability = model.predict_proba(features)[0][prediction]
+    # Regra médica: se tem mais de 8 sintomas, força CANCER
+    if sintomas >= 8:
+        prediction = 1  # CANCER
+        probability = 0.95
+    else:
+        features = np.array([[
+            patient.GENDER, patient.AGE, patient.SMOKING,
+            patient.YELLOW_FINGERS, patient.ANXIETY, patient.PEER_PRESSURE,
+            patient.CHRONIC_DISEASE, patient.FATIGUE, patient.ALLERGY,
+            patient.WHEEZING, patient.ALCOHOL_CONSUMING, patient.COUGHING,
+            patient.SHORTNESS_OF_BREATH, patient.SWALLOWING_DIFFICULTY,
+            patient.CHEST_PAIN, smoking_age, sintomas, risk_score
+        ]])
+        
+        prediction = model.predict(features)[0]
+        probability = model.predict_proba(features)[0][prediction]
     
     return {
         "prediction": "CANCER" if prediction == 1 else "NO_CANCER",
