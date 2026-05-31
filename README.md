@@ -192,7 +192,7 @@ pip install -r requirements.txt
 **Passo 2: Iniciar banco de dados PostgreSQL**
 
 ```bash
-docker-compose up -d postgres
+docker-compose up -d db
 ```
 
 Aguarde 30 segundos para inicialização do banco.
@@ -272,7 +272,7 @@ cd src/api && uvicorn app:app --reload --host 0.0.0.0 --port 8000
 **Passo 6: Iniciar frontend Streamlit (novo terminal)**
 
 ```bash
-cd src/frontend && streamlit run app_streamlit.py
+streamlit run src/frontend/app_streamlit.py
 ```
 
 ---
